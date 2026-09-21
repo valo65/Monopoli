@@ -1,0 +1,32 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Добавяне на полета{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 700px; margin: 0 auto;">
+    <h1>🎲 Добавяне на полета за "{{ game.title }}"</h1>
+    <p>Добавете полета едно по едно. Номерацията започва от 0 (Старт).</p>
+
+    <form method="post" enctype="multipart/form-data" style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Добави поле</button>
+    </form>
+
+    <hr style="margin: 30px 0;">
+
+    <h3>Добавени полета:</h3>
+    <ul style="list-style: none; padding: 0;">
+        {% for field in fields %}
+            <li style="background: rgba(255,255,255,0.1); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                <strong>#{{ field.position }}</strong> - {{ field.get_field_type_display }}
+                {% if field.label %} - {{ field.label }}{% endif %}
+            </li>
+        {% empty %}
+            <li>Все още няма добавени полета.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'main_app:play_game' game.id %}" class="btn" style="margin-top: 20px;">▶️ Преглед на играта</a>
+</div>
+{% endblock %}

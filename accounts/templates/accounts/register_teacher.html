@@ -1,0 +1,15 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Регистрация на преподавател{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 500px; margin: 0 auto;">
+    <h1> Регистрация на преподавател</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Регистрирай се</button>
+    </form>
+    <p style="margin-top: 1rem;">Вече имате профил? <a href="{% url 'accounts:login' %}" style="color: #ffd700;">Вход</a></p>
+</div>
+{% endblock %}

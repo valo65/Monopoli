@@ -1,0 +1,45 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 700px; margin: 0 auto; text-align: center;">
+    <h1>Регистрация</h1>
+    <p style="margin-bottom: 40px;">Изберете типа на профила, който искате да създадете:</p>
+
+    <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+        <!-- Студент -->
+        <a href="{% url 'accounts:register_student' %}"
+           style="text-decoration: none; flex: 1; min-width: 250px; max-width: 300px;">
+            <div style="background: rgba(0, 100, 255, 0.2); border: 2px solid #0064ff;
+                        border-radius: 15px; padding: 40px 20px; transition: all 0.3s;
+                        cursor: pointer;"
+                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(0,100,255,0.4)'"
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <div style="font-size: 4rem;"></div>
+                <h2 style="color: #fff; margin: 15px 0;">Студент</h2>
+                <p style="color: #ddd;">Регистрирайте се с факултетен номер и се присъединете към група.</p>
+            </div>
+        </a>
+
+        <!-- Преподавател -->
+        <a href="{% url 'accounts:register_teacher' %}"
+           style="text-decoration: none; flex: 1; min-width: 250px; max-width: 300px;">
+            <div style="background: rgba(255, 193, 7, 0.2); border: 2px solid #ffc107;
+                        border-radius: 15px; padding: 40px 20px; transition: all 0.3s;
+                        cursor: pointer;"
+                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(255,193,7,0.4)'"
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <div style="font-size: 4rem;"></div>
+                <h2 style="color: #fff; margin: 15px 0;">Преподавател</h2>
+                <p style="color: #ddd;">Създавайте игри и управлявайте групи. Изисква одобрение от администратор.</p>
+            </div>
+        </a>
+    </div>
+
+    <p style="margin-top: 40px;">
+        Вече имате профил?
+        <a href="{% url 'accounts:login' %}" style="color: #ffd700;">Влезте тук</a>
+    </p>
+</div>
+{% endblock %}

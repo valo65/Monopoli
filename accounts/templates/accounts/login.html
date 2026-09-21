@@ -1,0 +1,25 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 500px; margin: 0 auto;">
+    <h1> Вход</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            <label for="username">Потребителско име / Факултетен номер:</label>
+            <input type="text" name="username" id="username" required>
+        </p>
+        <p>
+            <label for="password">Парола (само за преподаватели и админи):</label>
+            <input type="password" name="password" id="password">
+        </p>
+        <button type="submit" class="btn">Вход</button>
+    </form>
+    <p style="margin-top: 1rem;">
+        Нямате профил? <a href="{% url 'accounts:register_student' %}" style="color: #ffd700;">Регистрация за студент</a> |
+        <a href="{% url 'accounts:register_teacher' %}" style="color: #ffd700;">Регистрация за преподавател</a>
+    </p>
+</div>
+{% endblock %}

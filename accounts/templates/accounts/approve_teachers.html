@@ -1,0 +1,25 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Одобряване на преподаватели{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1> Чакащи преподаватели за одобрение</h1>
+    {% if pending_teachers %}
+        <ul>
+        {% for teacher in pending_teachers %}
+            <li>
+                {{ teacher.user.get_full_name }} ({{ teacher.user.email }})
+                <form method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="teacher_id" value="{{ teacher.id }}">
+                    <button type="submit" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">✅ Одобри</button>
+                </form>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Няма чакащи преподаватели.</p>
+    {% endif %}
+</div>
+{% endblock %}

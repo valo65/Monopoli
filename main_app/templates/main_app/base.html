@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Обучаващо Монополи{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main_app/css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="{% url 'main_app:index' %}" style="color: white; text-decoration: none;">
+                🎲 Обучаващо Монополи
+            </a>
+        </div>
+        <ul class="nav-menu">
+            <!-- Общи страници за всички -->
+            <li><a href="{% url 'main_app:index' %}">Начало</a></li>
+            <li><a href="{% url 'main_app:about' %}">За играта</a></li>
+            <li><a href="{% url 'main_app:contact' %}">Контакти</a></li>
+
+            {% if user.is_authenticated %}
+                {# ---- ЛОГНАТ ПОТРЕБИТЕЛ ---- #}
+                {% if user.profile.role == 'STUDENT' %}
+                    {# Меню за студент #}
+                    <li><a href="#"> Присъединяване към група</a></li>
+                    <li><a href="#"> Създай група</a></li>
+                    <li><a href="#"> Започни игра</a></li>
+                {% elif user.profile.role == 'TEACHER' %}
+                    {# Меню за преподавател (след одобрение) #}
+                    <li><a href="#"> Управление на групи</a></li>
+                    <li><a href="{% url 'main_app:create_game' %}">Създай игра</a></li>
+                    <li><a href="#">Моите игри</a></li>
+                    <li><a href="#">Управление на групи</a></li>
+                {% elif user.profile.role == 'ADMIN' %}
+                    {# Меню за администратор #}
+                    <li><a href="{% url 'accounts:approve_teachers' %}">Одобри преподаватели</a></li>
+                    <li><a href="/admin/">Админ панел</a></li>
+                {% endif %}
+
+                {# Общи за всички логнати #}
+                <li><a href="{% url 'accounts:profile' %}">Профил</a></li>
+                <li><a href="{% url 'accounts:logout' %}">Изход</a></li>
+
+            {% else %}
+                {# ---- НЕЛОГНАТ ПОТРЕБИТЕЛ ---- #}
+                <li><a href="{% url 'accounts:login' %}">Вход</a></li>
+                <li><a href="{% url 'accounts:register_choice' %}">Регистрация</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Основно съдържание -->
+    <main>
+        {% if messages %}
+            <div class="messages" style="max-width: 800px; margin: 0 auto 20px auto; padding: 0 20px;">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" style="padding: 12px 20px; border-radius: 8px; margin-bottom: 10px;
+                        {% if message.tags == 'error' %}background: rgba(220, 50, 50, 0.9); color: white;
+                        {% elif message.tags == 'success' %}background: rgba(50, 200, 50, 0.9); color: white;
+                        {% elif message.tags == 'warning' %}background: rgba(255, 165, 0, 0.9); color: white;
+                        {% else %}background: rgba(0, 100, 200, 0.9); color: white;{% endif %}
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Футър -->
+    <footer>
+        <p>&copy; 2026 Обучаващо Монополи - Играй и учи!</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

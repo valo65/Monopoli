@@ -1,0 +1,15 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Редактиране на профил{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 600px; margin: 0 auto;">
+    <h1>Редактиране на профил</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Запази промените</button>
+    </form>
+    <p style="margin-top: 15px;"><a href="{% url 'accounts:profile' %}" style="color: #ffd700;">Обратно към профила</a></p>
+</div>
+{% endblock %}

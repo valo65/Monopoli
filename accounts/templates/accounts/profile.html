@@ -1,0 +1,126 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Моят профил{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 800px; margin: 0 auto;">
+    <h1>Моят профил</h1>
+
+    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+        <p><strong>Потребителско име:</strong> {{ user.username }}</p>
+        <p><strong>Име:</strong> {{ user.get_full_name }}</p>
+        <p><strong>Имейл:</strong> {{ user.email }}</p>
+        <p><strong>Роля:</strong> {{ profile.get_role_display }}</p>
+
+        {% if profile.phone %}
+            <p><strong>Телефон:</strong> {{ profile.phone }}</p>
+        {% endif %}
+
+        {% if role == 'STUDENT' and profile.faculty_number %}
+            <p><strong>Факултетен номер:</strong> {{ profile.faculty_number }}</p>
+            <p><strong>Група:</strong> {{ profile.group|default:"Не е зададена" }}</p>
+        {% endif %}
+
+        {% if role == 'TEACHER' %}
+            <p><strong>Статус на одобрение:</strong>
+                {% if profile.is_approved %}
+                    <span style="color: #4caf50;">Одобрен</span>
+                {% else %}
+                    <span style="color: #ff9800;">Чака одобрение</span>
+                {% endif %}
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- РАЗЛИЧНА ИНФОРМАЦИЯ ПО РОЛЯ -->
+    {% if role == 'STUDENT' %}
+        <h2>Моите игри</h2>
+        {% if sessions %}
+            <ul style="list-style: none; padding: 0;">
+                {% for session in sessions %}
+                    <li style="background: rgba(255,215,0,0.1); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>{{ session.game.title }}</strong> –
+                        Точки: {{ session.score }} |
+                        Позиция: {{ session.current_position }} |
+                        {% if session.is_finished %}Завършена{% else %}В процес{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Все още нямате участия в игри.</p>
+        {% endif %}
+
+        <h2>Моите групи</h2>
+        {% if groups %}
+            <ul style="list-style: none; padding: 0;">
+                {% for group in groups %}
+                    <li style="background: rgba(255,215,0,0.1); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>{{ group.name }}</strong> (водена от {{ group.teacher.get_full_name }})
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Все още не сте в група.</p>
+        {% endif %}
+
+    {% elif role == 'TEACHER' %}
+        <h2>Моите групи</h2>
+        {% if groups %}
+            <ul style="list-style: none; padding: 0;">
+                {% for group in groups %}
+                    <li style="background: rgba(255,215,0,0.1); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>{{ group.name }}</strong> – {{ group.students.count }} студенти
+                        {% if group.game %} | Игра: {{ group.game.title }}{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Все още нямате създадени групи.</p>
+        {% endif %}
+
+        <h2>🎮 Моите игри</h2>
+        {% if games %}
+            <ul style="list-style: none; padding: 0;">
+                {% for game in games %}
+                    <li style="background: rgba(255,215,0,0.1); padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        <strong>{{ game.title }}</strong> – {{ game.subject }}
+                        {% if not game.is_active %} (неактивна){% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Все още нямате създадени игри.</p>
+        {% endif %}
+
+    {% elif role == 'ADMIN' or user.is_superuser %}
+        <h2>Статистика</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div style="background: rgba(76, 175, 80, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                <h3>{{ total_users }}</h3>
+                <p>Общо потребители</p>
+            </div>
+            <div style="background: rgba(33, 150, 243, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                <h3>{{ total_students }}</h3>
+                <p>Студенти</p>
+            </div>
+            <div style="background: rgba(255, 193, 7, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                <h3>{{ total_teachers }}</h3>
+                <p>Одобрени преподаватели</p>
+            </div>
+            <div style="background: rgba(244, 67, 54, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                <h3>{{ pending_teachers }}</h3>
+                <p>Чакащи преподаватели</p>
+            </div>
+            <div style="background: rgba(156, 39, 176, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                <h3>{{ total_games }}</h3>
+                <p>Създадени игри</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 30px; display: flex; gap: 15px;">
+        <a href="{% url 'main_app:index' %}" class="btn" style="background: #555;">Начало</a>
+        <a href="{% url 'accounts:edit_profile' %}" class="btn">Редактирай профил</a>
+    </div>
+</div>
+{% endblock %}

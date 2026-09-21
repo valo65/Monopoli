@@ -1,0 +1,389 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    line-height: 1.6;
+    color: #333;
+    background-image: url('/static/main_app/images/monopoly.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* 👇 ТЪМНА ЗАВЕСА върху фоновата картинка */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 20, 80, 0.6);    /* 30% прозрачност – доста тъмно */
+    z-index: -1;
+    pointer-events: none;
+}
+/* ===== НАВИГАЦИЯ ===== */
+.navbar {
+    background: rgba(10, 40, 120, 0.6);  /* полупрозрачно синьо */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.logo a {
+    color: #ffffff;   /* бял текст */
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.logo a:hover {
+    color: #ffd700;   /* златен при hover */
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-menu li {
+    display: inline-block;
+}
+
+.nav-menu a {
+    color: #ffffff;          /* бял текст */
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.nav-menu a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffd700;          /* златен при hover */
+}
+
+/* ===== ОСНОВНО СЪДЪРЖАНИЕ ===== */
+main {
+    flex: 1;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    width: 100%;
+}
+
+.hero {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.hero p {
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.btn {
+    display: inline-block;
+    background: #ffd700;
+    color: #0a1a3a;
+    padding: 0.8rem 2rem;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 1rem;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background: #f0c000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #ffffff;          /* бял текст за страници като "Контакти" */
+}
+
+.content h1 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.content p {
+    color: #ffffff;
+    font-size: 1.1rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* ===== ФУТЪР ===== */
+footer {
+    background: #0a1a3a;
+    color: #a0b0c0;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: auto;
+    border-top: 2px solid #ffd700;
+}
+
+/* ===== АДАПТИВНОСТ ===== */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+}
+
+/* ============================================================
+   ИГРАЛНО ПОЛЕ
+   ============================================================ */
+
+.game-wrapper {
+    max-width: 950px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 3px;
+    width: 100%;
+    aspect-ratio: 1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    border-radius: 12px;
+}
+
+.cell {
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    position: relative;
+    transition: all 0.3s;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+    padding: 2px;
+    overflow: hidden;
+}
+
+.cell-corner {
+    background: rgba(60, 60, 60, 0.9);
+    border: 2px solid #444;
+}
+
+.cell-start {
+    background: linear-gradient(135deg, #00c853, #00e676);
+    border: 3px solid #00ff88;
+    font-size: 0.85rem;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+}
+
+.cell-center {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell-center img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* 8 цвята за групите */
+.group-1 { background: #8B4513; }
+.group-2 { background: #87CEEB; color: #000; text-shadow: none; }
+.group-3 { background: #FF69B4; }
+.group-4 { background: #FF8C00; }
+.group-5 { background: #DC143C; }
+.group-6 { background: #FFD700; color: #000; text-shadow: none; }
+.group-7 { background: #228B22; }
+.group-8 { background: #191970; }
+
+.cell.player-here {
+    box-shadow: 0 0 0 3px #00ff88, 0 0 20px 6px rgba(0, 255, 136, 0.8);
+    transform: scale(1.12);
+    z-index: 10;
+}
+
+.player-token {
+    position: absolute;
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 5px #00ff88);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.2); }
+}
+
+/* ============================================================
+   ЗАР
+   ============================================================ */
+
+.dice-area {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.dice-scene {
+    width: 100px;
+    height: 100px;
+    perspective: 600px;
+    margin: 0 auto 20px;
+}
+
+.dice {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.2s ease-out;
+}
+
+.dice.rolling {
+    animation: rollDice 1.2s ease-out;
+}
+
+@keyframes rollDice {
+    0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    25%  { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+    50%  { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+    75%  { transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg); }
+    100% { transform: rotateX(1440deg) rotateY(720deg) rotateZ(360deg); }
+}
+
+.dice-face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.dice-dot {
+    width: 14px;
+    height: 14px;
+    background: #222;
+    border-radius: 50%;
+    align-self: center;
+    justify-self: center;
+}
+
+.face-1 { transform: rotateY(0deg) translateZ(50px); }
+.face-2 { transform: rotateY(90deg) translateZ(50px); }
+.face-3 { transform: rotateY(180deg) translateZ(50px); }
+.face-4 { transform: rotateY(-90deg) translateZ(50px); }
+.face-5 { transform: rotateX(90deg) translateZ(50px); }
+.face-6 { transform: rotateX(-90deg) translateZ(50px); }
+
+.dice-result {
+    font-size: 2rem;
+    color: #ffd700;
+    font-weight: bold;
+    margin: 10px 0;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.roll-btn {
+    background: #ffd700;
+    color: #0a1a3a;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.roll-btn:hover:not(:disabled) {
+    background: #f0c000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.roll-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.animation-toggle {
+    margin-top: 15px;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.animation-toggle input {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.field-info {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    color: #fff;
+    display: none;
+    border-left: 4px solid #ffd700;
+}

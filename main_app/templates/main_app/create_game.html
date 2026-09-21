@@ -1,0 +1,14 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Създай нова игра{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 600px; margin: 0 auto;">
+    <h1>🎯 Създай нова обучаваща игра</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Създай игра</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ game.title }}{% endblock %}
+
+{% block content %}
+<div class="game-wrapper" id="gameWrapper" data-session-id="{{ session.id }}">
+    <h1 style="text-align:center; color:#fff;">🎲 {{ game.title }}</h1>
+    <p style="text-align:center; color:#fff;"><strong>Дисциплина:</strong> {{ game.subject }}</p>
+
+    <!-- ИГРАЛНО ПОЛЕ -->
+    <div class="board">
+        {% for cell in board %}
+            {% if cell.type == 'CENTER' %}
+                <div class="cell cell-center"
+                     data-row="2" data-col="2"
+                     data-rowspan="8" data-colspan="8">
+                    {% if game.center_image %}
+                        <img src="{{ game.center_image.url }}" alt="{{ game.title }}">
+                    {% else %}
+                        <div style="color:#aaa;">Няма централна картина</div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="cell
+                    {% if cell.type == 'START' %}cell-start
+                    {% elif cell.type == 'CORNER' %}cell-corner
+                    {% elif cell.type == 'FIELD' %}group-{{ cell.group }}
+                        {% if cell.position == session.current_position %}player-here{% endif %}
+                    {% endif %}"
+                    data-row="{{ cell.row }}"
+                    data-col="{{ cell.col }}"
+                    data-position="{{ cell.position|default:'' }}">
+
+                    {% if cell.type == 'START' %}
+                        <div>🚩<br>СТАРТ</div>
+                    {% elif cell.type == 'FIELD' and cell.field %}
+                        <div>
+                            <strong>{{ cell.position }}</strong><br>
+                            <small>{{ cell.field.get_field_type_display }}</small>
+                        </div>
+                        {% if cell.position == session.current_position %}
+                            <span class="player-token">🎯</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- ЗАР -->
+    <div class="dice-area">
+        <div class="dice-scene">
+            <div class="dice" id="dice">
+                <div class="dice-face face-1">
+                    <span></span><span></span><span></span>
+                    <span></span><span class="dice-dot"></span><span></span>
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="dice-face face-2">
+                    <span class="dice-dot"></span><span></span><span></span>
+                    <span></span><span class="dice-dot"></span><span></span>
+                    <span></span><span></span><span class="dice-dot"></span>
+                </div>
+                <div class="dice-face face-3">
+                    <span class="dice-dot"></span><span></span><span></span>
+                    <span></span><span class="dice-dot"></span><span></span>
+                    <span></span><span></span><span class="dice-dot"></span>
+                </div>
+                <div class="dice-face face-4">
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                    <span></span><span></span><span></span>
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                </div>
+                <div class="dice-face face-5">
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                    <span></span><span class="dice-dot"></span><span></span>
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                </div>
+                <div class="dice-face face-6">
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                    <span class="dice-dot"></span><span></span><span class="dice-dot"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dice-result" id="diceResult">—</div>
+
+        <button class="roll-btn" id="rollBtn" {% if session.is_finished %}disabled{% endif %}>
+            🎲 Хвърли зар
+        </button>
+
+        <div class="animation-toggle">
+            <label>
+                <input type="checkbox" id="animToggle" checked>
+                Анимация на зара
+            </label>
+        </div>
+    </div>
+
+    <!-- ИНФОРМАЦИЯ ЗА ПОЛЕТО -->
+    <div class="field-info" id="fieldInfo"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ============================================================
+    // ПРИЛАГАНЕ НА GRID ПОЗИЦИИТЕ ОТ data-АТРИБУТИ
+    // ============================================================
+    document.querySelectorAll('.cell[data-row]').forEach(function (cell) {
+        var row = cell.dataset.row;
+        var col = cell.dataset.col;
+        var rowspan = cell.dataset.rowspan || 1;
+        var colspan = cell.dataset.colspan || 1;
+
+        cell.style.gridRow = row + ' / span ' + rowspan;
+        cell.style.gridColumn = col + ' / span ' + colspan;
+    });
+
+    // ============================================================
+    // ЗАР
+    // ============================================================
+    var gameWrapper = document.getElementById('gameWrapper');
+    var sessionId = gameWrapper.dataset.sessionId;
+
+    var rollBtn = document.getElementById('rollBtn');
+    var dice = document.getElementById('dice');
+    var diceResult = document.getElementById('diceResult');
+    var animToggle = document.getElementById('animToggle');
+    var fieldInfo = document.getElementById('fieldInfo');
+
+    // Зареждане на предпочитанието за анимация
+    var savedPref = localStorage.getItem('diceAnimation');
+    if (savedPref !== null) {
+        animToggle.checked = savedPref === 'on';
+    }
+
+    animToggle.addEventListener('change', function () {
+        localStorage.setItem('diceAnimation', animToggle.checked ? 'on' : 'off');
+    });
+
+    // Вземане на CSRF токен
+    function getCookie(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+    }
+
+    // Хвърляне на зар
+    rollBtn.addEventListener('click', async function () {
+        rollBtn.disabled = true;
+        diceResult.textContent = '...';
+        fieldInfo.style.display = 'none';
+
+        var animate = animToggle.checked;
+        if (animate) {
+            dice.classList.add('rolling');
+        }
+
+        try {
+            var response = await fetch('/roll-dice/' + sessionId + '/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            var data = await response.json();
+
+            if (data.error) {
+                alert(data.error);
+                rollBtn.disabled = false;
+                return;
+            }
+
+            // Изчакваме анимацията (ако е включена)
+            var delay = animate ? 1200 : 200;
+
+            setTimeout(function () {
+                if (animate) {
+                    dice.classList.remove('rolling');
+                }
+
+                diceResult.textContent = '🎲 ' + data.dice;
+
+                // Показваме информация за полето
+                if (data.field) {
+                    var html = '<h3>📍 Поле ' + data.field.position + ' – ' + data.field.type_display + '</h3>';
+                    if (data.field.material_title) {
+                        html += '<p><strong>' + data.field.material_title + '</strong></p>';
+                    }
+                    if (data.field.material_content) {
+                        html += '<p>' + data.field.material_content + '</p>';
+                    }
+                    if (data.field.material_image) {
+                        html += '<img src="' + data.field.material_image + '" style="max-width:100%; border-radius:8px; margin-top:10px;">';
+                    }
+                    if (data.field.material_link) {
+                        html += '<p><a href="' + data.field.material_link + '" target="_blank" style="color:#ffd700;">🔗 Допълнителен материал</a></p>';
+                    }
+                    if (data.field.has_questions) {
+                        html += '<p style="color:#ffd700;">❓ Има въпроси на това поле</p>';
+                    }
+                    fieldInfo.innerHTML = html;
+                    fieldInfo.style.display = 'block';
+                } else if (data.is_finished) {
+                    fieldInfo.innerHTML = '<h3>🏁 Играта завърши!</h3>';
+                    fieldInfo.style.display = 'block';
+                }
+
+                // Премахваме стария маркер
+                document.querySelectorAll('.cell').forEach(function (c) {
+                    c.classList.remove('player-here');
+                    var t = c.querySelector('.player-token');
+                    if (t) t.remove();
+                });
+
+                // Поставяме новия маркер
+                var newCell = document.querySelector('.cell[data-position="' + data.new_position + '"]');
+                if (newCell) {
+                    newCell.classList.add('player-here');
+                    var tok = document.createElement('span');
+                    tok.className = 'player-token';
+                    tok.textContent = '🎯';
+                    newCell.appendChild(tok);
+                }
+
+                // Дали играта е завършила
+                if (data.is_finished) {
+                    diceResult.textContent += ' 🏁 Край!';
+                    rollBtn.disabled = true;
+                } else {
+                    rollBtn.disabled = false;
+                }
+            }, delay);
+
+        } catch (err) {
+            console.error(err);
+            diceResult.textContent = '❌ Грешка';
+            rollBtn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}
