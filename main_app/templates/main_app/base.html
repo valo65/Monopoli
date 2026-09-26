@@ -26,12 +26,14 @@
                 {# ---- ЛОГНАТ ПОТРЕБИТЕЛ ---- #}
                 {% if user.profile.role == 'STUDENT' %}
                     {# Меню за студент #}
-                    <li><a href="#"> Присъединяване към група</a></li>
-                    <li><a href="#"> Създай група</a></li>
+                    <li><a href="{% url 'main_app:group_list' %}">Моите групи</a></li>
+                    <li><a href="{% url 'main_app:create_group' %}">Създай група</a></li>
+                    <li><a href="{% url 'main_app:join_group' %}">Присъедини се</a></li>
                     <li><a href="#"> Започни игра</a></li>
                 {% elif user.profile.role == 'TEACHER' %}
                     {# Меню за преподавател (след одобрение) #}
-                    <li><a href="#"> Управление на групи</a></li>
+                    <li><a href="{% url 'main_app:group_list' %}">Моите групи</a></li>
+                    <li><a href="{% url 'main_app:create_group' %}">Създай група</a></li>
                     <li><a href="{% url 'main_app:create_game' %}">Създай игра</a></li>
                     <li><a href="#">Моите игри</a></li>
                     <li><a href="#">Управление на групи</a></li>

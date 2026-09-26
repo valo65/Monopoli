@@ -1,0 +1,47 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>👥 {{ group.name }}</h1>
+    <p><strong>Игра:</strong> {{ group.game.title }} ({{ group.game.subject }})</p>
+    <p><strong>Създател:</strong> {{ group.created_by.get_full_name }}</p>
+    <p><strong>Код за присъединяване:</strong>
+        <code style="color:#ffd700; font-size:1.3rem;">{{ group.join_code }}</code>
+    </p>
+
+    <h2>👨‍🎓 Членове ({{ group.students.count }})</h2>
+    <ul>
+        {% for student in group.students.all %}
+            <li>{{ student.get_full_name }} ({{ student.profile.faculty_number }})</li>
+        {% endfor %}
+    </ul>
+
+    {% if group.is_teacher_group and group.created_by == user %}
+        <a href="{% url 'main_app:add_students' group.id %}" class="btn">➕ Добави студенти</a>
+    {% endif %}
+
+    {% if can_start %}
+        {% if group.is_started %}
+            <p style="color:#00ff88; font-size:1.2rem;">Играта е стартирана</p>
+            <a href="{% url 'main_app:play_game' group.game.id %}" class="btn">Играй</a>
+        {% else %}
+            <a href="{% url 'main_app:start_group_game' group.id %}" class="btn">Стартирай играта</a>
+        {% endif %}
+    {% else %}
+        <p style="color:#ff9800;">Изчаква се преподавателят да стартира играта.</p>
+    {% endif %}
+
+    <h2>Сесии</h2>
+    {% if sessions %}
+        <ul>
+            {% for s in sessions %}
+                <li>{{ s.student.get_full_name }} – Точки: {{ s.score }} | Позиция: {{ s.current_position }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Все още няма активни сесии.</p>
+    {% endif %}
+</div>
+{% endblock %}

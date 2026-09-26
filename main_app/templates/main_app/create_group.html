@@ -1,0 +1,28 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Създай група{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 600px; margin: 0 auto;">
+    <h1>➕ Създай нова група</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>
+            <label>Име на групата:</label>
+            <input type="text" name="name" required maxlength="100"
+                   style="width:100%; padding:10px; border-radius:6px; border:none;">
+        </p>
+        <p>
+            <label>Избери игра:</label>
+            <select name="game" required
+                    style="width:100%; padding:10px; border-radius:6px; border:none;">
+                <option value="">-- Избери --</option>
+                {% for game in games %}
+                    <option value="{{ game.id }}">{{ game.title }} ({{ game.subject }})</option>
+                {% endfor %}
+            </select>
+        </p>
+        <button type="submit" class="btn">Създай</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Моите групи{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>👥 Моите групи</h1>
+
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'main_app:create_group' %}" class="btn">➕ Създай група</a>
+        <a href="{% url 'main_app:join_group' %}" class="btn" style="background:#2196F3;">🔗 Присъедини се</a>
+    </div>
+
+    {% if groups %}
+        <ul style="list-style: none; padding: 0;">
+            {% for group in groups %}
+                <li style="background: rgba(255,215,0,0.1); padding: 15px; margin: 10px 0; border-radius: 8px;">
+                    <a href="{% url 'main_app:group_detail' group.id %}"
+                       style="color: #fff; text-decoration: none; font-size: 1.2rem;">
+                        <strong>{{ group.name }}</strong>
+                    </a>
+                    <p style="color: #ccc; margin: 5px 0;">
+                        Игра: {{ group.game.title }} |
+                        Код: <code style="color: #ffd700;">{{ group.join_code }}</code> |
+                        Членове: {{ group.students.count }} |
+                        {% if group.is_started %}Стартирала{% else %}Нестартирала{% endif %}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Все още нямате групи. Създайте нова или се присъединете с код.</p>
+    {% endif %}
+</div>
+{% endblock %}

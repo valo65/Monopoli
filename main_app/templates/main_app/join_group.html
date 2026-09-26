@@ -1,0 +1,17 @@
+{% extends 'main_app/base.html' %}
+
+{% block title %}Присъедини се към група{% endblock %}
+
+{% block content %}
+<div class="content" style="max-width: 500px; margin: 0 auto; text-align:center;">
+    <h1>🔗 Присъедини се</h1>
+    <p>Въведи кода на групата:</p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="join_code" required maxlength="8"
+               style="width:100%; padding:15px; font-size:1.5rem; text-align:center;
+                      text-transform:uppercase; border-radius:8px; border:none; letter-spacing:3px;">
+        <button type="submit" class="btn" style="margin-top:20px;">Присъедини се</button>
+    </form>
+</div>
+{% endblock %}
